@@ -27,7 +27,7 @@ def _load_allowed_origins() -> list[str]:
 
 def _load_origin_regex() -> str:
     # Allow localhost during development and Vercel preview/production domains by default.
-    default_regex = r"^https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$|^https://[A-Za-z0-9-]+\\.vercel\\.app$"
+    default_regex = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://[A-Za-z0-9-]+\.vercel\.app$"
     configured_regex = (os.getenv("CORS_ORIGIN_REGEX") or "").strip()
     return configured_regex or default_regex
 
