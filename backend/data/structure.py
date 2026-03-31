@@ -5,8 +5,38 @@ from copy import deepcopy
 ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
     "CSE": {
         "1st Year": {
-            "Semester 1": ["Physics", "Mathematics", "Programming Basics"],
-            "Semester 2": ["Chemistry", "Electronics", "Engineering Graphics"],
+            "Semester 1": [
+                "Physics",
+                "Mathematics",
+                "Programming Basics",
+                "ACAD",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+                "Python Lab",
+            ],
+            "Semester 2": [
+                
+                "Mathematics",
+                "Physics",
+                "Chemistry",
+                "Electronics",
+                "Electrical",
+                "Mechanical",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+                "Python Programming Lab",
+                "Electronics Lab",
+                "Chemistry Lab",
+                "Electrical Lab",
+                "Physics Lab",
+                "Digital Workshop",
+
+                
+
+
+            ],
         },
         "2nd Year": {
             "Semester 3": ["Data Structures", "Digital Electronics"],
@@ -15,8 +45,27 @@ ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
     },
     "ECE": {
         "1st Year": {
-            "Semester 1": ["Physics", "Mathematics"],
-            "Semester 2": ["Basic Electronics"],
+            "Semester 1": [
+                "Physics",
+                "Mathematics",
+                "ACAD",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+            ],
+            "Semester 2": [
+                "Mathematics",
+                "Physics",
+                "Basic Electronics",
+                "Electrical",
+                "Mechanical",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+                "Python Lab",
+                "Electronics Lab",
+                "Chemistry Lab",
+            ],
         },
         "2nd Year": {
             "Semester 3": ["Signals and Systems", "Network Theory"],
@@ -25,8 +74,28 @@ ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
     },
     "ME": {
         "1st Year": {
-            "Semester 1": ["Engineering Mechanics", "Mathematics"],
-            "Semester 2": ["Thermodynamics", "Material Science"],
+            "Semester 1": [
+                "Engineering Mechanics",
+                "Mathematics",
+                "ACAD",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+            ],
+            "Semester 2": [
+                "Mathematics",
+                "Physics",
+                "Thermodynamics",
+                "Material Science",
+                "Electrical",
+                "Mechanical",
+                "ADAC",
+                "Soft Skills",
+                "Emerging Trends",
+                "Python Lab",
+                "Electronics Lab",
+                "Chemistry Lab",
+            ],
         }
     },
 }

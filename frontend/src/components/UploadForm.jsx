@@ -24,6 +24,16 @@ function getSubjects(structure, branch, year, semester) {
     return structure[branch][year][semester];
 }
 
+function getChapterTemplates(subject) {
+    const templates = ["Assignment Solutions", "Unit Notes", "Additional"];
+
+    if (subject && subject.toLowerCase().includes("lab")) {
+        return ["Manual Copy", ...templates];
+    }
+
+    return templates;
+}
+
 function parseTagInput(rawTags) {
     return rawTags
         .split(",")
@@ -55,6 +65,7 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
         () => getSubjects(structure, branch, year, semester),
         [structure, branch, year, semester]
     );
+    const chapterTemplates = useMemo(() => getChapterTemplates(subject), [subject]);
 
     function resetDependentFields(level) {
         if (level === "branch") {
@@ -266,6 +277,19 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
                             placeholder="Sorting, Unit 2, Chapter 4..."
                             className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
                         />
+
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            {chapterTemplates.map((template) => (
+                                <button
+                                    key={template}
+                                    type="button"
+                                    onClick={() => setChapter(template)}
+                                    className="rounded-md border border-zinc-300 px-2 py-1 text-[11px] font-medium text-zinc-700 transition hover:border-black"
+                                >
+                                    {template}
+                                </button>
+                            ))}
+                        </div>
                     </label>
 
                     <label className="text-sm font-medium text-zinc-700">
