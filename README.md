@@ -77,6 +77,28 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - `PINATA_JWT` (optional)
 - `CORS_ORIGINS` (comma-separated)
 
+## Backend Deploy on Render
+
+This repository includes Render deployment files:
+
+- `render.yaml` (Render Blueprint config)
+- `backend/Procfile` (explicit web process)
+
+Deploy steps:
+
+1. Push your code to GitHub.
+2. In Render, click **New +** -> **Blueprint**.
+3. Connect your repo and select this project.
+4. Render will create `studychain-backend` from `render.yaml`.
+5. In Render service settings, set environment variables:
+	- `PINATA_API_KEY`
+	- `PINATA_SECRET_API_KEY`
+	- `PINATA_JWT` (optional)
+	- `CORS_ORIGINS` (set to your frontend URL, for example `https://your-app.vercel.app`)
+	- `CORS_ORIGIN_REGEX` (optional)
+
+Default Render health check path is `/health`.
+
 ## Frontend Setup
 
 ```powershell
