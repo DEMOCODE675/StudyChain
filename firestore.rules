@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /notes/{noteId} {
+      allow read: if true;
+
+      function likedByList(data) {
+        return data.likedBy is list ? data.likedBy : [];
+      }
+
+      // Only authenticated users can create notes and must attach their own UID.
+      allow create: if request.auth != null
+        && request.resource.data.uploadedBy == request.auth.uid
+        && request.resource.data.likes is int
+        && request.resource.data.likes == 0
+        && request.resource.data.likedBy is list
+        && request.resource.data.likedBy.size() == 0;
+
+      function isValidLikeToggle() {
+        let beforeLikedBy = likedByList(resource.data);
+        let afterLikedBy = likedByList(request.resource.data);
+        let beforeLikes = resource.data.likes is int ? resource.data.likes : 0;
+        let afterLikes = request.resource.data.likes is int ? request.resource.data.likes : -1;
+
+        return (
+          (
+            request.auth.uid in afterLikedBy
+            && !(request.auth.uid in beforeLikedBy)
+            && afterLikes == beforeLikes + 1
+            && afterLikedBy.size() == beforeLikedBy.size() + 1
+          )
+          ||
+          (
+            !(request.auth.uid in afterLikedBy)
+            && request.auth.uid in beforeLikedBy
+            && afterLikes == beforeLikes - 1
+            && afterLikes >= 0
+            && afterLikedBy.size() == beforeLikedBy.size() - 1
+          )
+        );
+      }
+
+      // Only allow authenticated like/unlike toggles; all other fields stay immutable.
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["likes", "likedBy"])
+        && isValidLikeToggle();
+    }
+  }
+}
