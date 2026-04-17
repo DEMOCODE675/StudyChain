@@ -45,9 +45,36 @@ function sortNotes(notes, sortBy) {
     );
 }
 
+function applyOptimisticLike(notes, noteId, userId) {
+    return notes.map((note) => {
+        const isTarget =
+            note.id === noteId ||
+            note.cid === noteId;
+
+        if (!isTarget) {
+            return note;
+        }
+
+        const currentLikedBy = Array.isArray(note.likedBy) ? note.likedBy : [];
+        const alreadyLiked = currentLikedBy.includes(userId);
+        const nextLikedBy = alreadyLiked
+            ? currentLikedBy.filter((uid) => uid !== userId)
+            : [...currentLikedBy, userId];
+        const currentLikes = typeof note.likes === "number" && Number.isFinite(note.likes)
+            ? note.likes
+            : 0;
+        const nextLikes = alreadyLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+
+        return {
+            ...note,
+            likedBy: nextLikedBy,
+            likes: nextLikes,
+        };
+    });
+}
+
 export default function Explore({ filters, refreshToken, user, onRequestLogin }) {
     const [notes, setNotes] = useState([]);
-    const [topNotes, setTopNotes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const [searchInput, setSearchInput] = useState("");
@@ -119,29 +146,6 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
         };
     }, [filters, chapterFilter, debouncedKeyword, refreshToken]);
 
-    useEffect(() => {
-        let active = true;
-
-        async function loadTopNotes() {
-            try {
-                const response = await getAllNotes();
-                if (active) {
-                    setTopNotes(sortNotes(response, "likes").slice(0, 3));
-                }
-            } catch {
-                if (active) {
-                    setTopNotes([]);
-                }
-            }
-        }
-
-        void loadTopNotes();
-
-        return () => {
-            active = false;
-        };
-    }, [refreshToken]);
-
     const sortedNotes = useMemo(() => sortNotes(notes, sortBy), [notes, sortBy]);
     const chapterOptions = useMemo(() => {
         const chapters = new Set(notes.map((note) => note.chapter));
@@ -161,6 +165,13 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
             return;
         }
 
+        if (likingCid === noteId) {
+            return;
+        }
+
+        setErrorMessage("");
+        const previousNotes = notes;
+        setNotes((prev) => applyOptimisticLike(prev, noteId, user.uid));
         setLikingCid(noteId);
         try {
             const updated = await likeNote(noteId, user.uid);
@@ -171,13 +182,8 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
                 note.cid === noteId;
 
             setNotes((prev) => prev.map((note) => (isSameNote(note) ? updated : note)));
-            setTopNotes((prev) => {
-                const merged = prev.some((note) => isSameNote(note))
-                    ? prev.map((note) => (isSameNote(note) ? updated : note))
-                    : [...prev, updated];
-                return sortNotes(merged, "likes").slice(0, 3);
-            });
         } catch (error) {
+            setNotes(previousNotes);
             setErrorMessage(readApiError(error, "Failed to like this note."));
         } finally {
             setLikingCid("");
@@ -187,13 +193,13 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
     return (
         <section className="space-y-5">
             <header className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                <p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Discover</p>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight">Explore Notes</h2>
-                <p className="mt-2 text-sm text-zinc-600">
+                {/*<p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Discover</p>*/}
+                <h2 className="mt-2 text-3xl font-bold tracking-tight">Find Notes</h2>
+                {/*<p className="mt-2 text-sm text-zinc-600">
                     Search and filter notes by branch, year, semester, subject, chapter, and tags.
-                </p>
+                </p>*/}
 
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {/*<div className="mt-4 grid gap-3 md:grid-cols-3">
                     <label className="text-sm font-medium text-zinc-700 md:col-span-2">
                         Search by filename, subject, chapter, or tags
                         <input
@@ -216,9 +222,9 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
                             <option value="likes">Most liked</option>
                         </select>
                     </label>
-                </div>
+                </div>*/}
 
-                <div className="mt-3">
+                {/*<div className="mt-3">
                     <label className="text-sm font-medium text-zinc-700">
                         Chapter filter
                         <select
@@ -234,7 +240,7 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
                             ))}
                         </select>
                     </label>
-                </div>
+                </div>*/}
             </header>
 
             {errorMessage ? (
@@ -242,34 +248,6 @@ export default function Explore({ filters, refreshToken, user, onRequestLogin })
                     {errorMessage}
                 </div>
             ) : null}
-
-            <section className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-semibold">Top Notes</h3>
-                    <span className="mono text-xs uppercase tracking-[0.1em] text-zinc-500">
-                        Sorted by likes
-                    </span>
-                </div>
-
-                {topNotes.length === 0 ? (
-                    <p className="text-sm text-zinc-500">No top notes yet. Be the first to upload and like notes.</p>
-                ) : (
-                    <div className="grid gap-3 lg:grid-cols-3">
-                        {topNotes.map((note) => (
-                            <NoteCard
-                                key={`top-${note.id}`}
-                                note={note}
-                                onLike={handleLike}
-                                isLiking={likingCid === (note.id || note.cid)}
-                                isLiked={Boolean(user && Array.isArray(note.likedBy) && note.likedBy.includes(user.uid))}
-                                canLike={Boolean(user)}
-                                onRequireLogin={onRequestLogin}
-                                highlight
-                            />
-                        ))}
-                    </div>
-                )}
-            </section>
 
             <section className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
                 <div className="mb-4 flex items-center justify-between gap-3">

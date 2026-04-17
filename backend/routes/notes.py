@@ -1,7 +1,12 @@
 from datetime import datetime, timezone
+import asyncio
+import os
 from pathlib import Path
+from urllib.parse import quote
 
-from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile, status
+import requests
+
+from fastapi import APIRouter, File, Form, HTTPException, Query, Response, UploadFile, status
 
 from data.structure import get_academic_structure, is_valid_structure_path
 from models.note import Note, NoteLikeRequest
@@ -13,6 +18,7 @@ router = APIRouter(tags=["notes"])
 _NOTES: list[Note] = []
 _ALLOWED_EXTENSIONS = {".pdf", ".txt"}
 _DEFAULT_UPLOADER = "0x0000000000000000000000000000000000000000"
+_DEFAULT_IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs"
 
 
 def _is_allowed_file(filename: str) -> bool:
@@ -48,6 +54,31 @@ def _parse_tags(raw_tags: str | None) -> list[str]:
     return normalized_tags
 
 
+def _build_ipfs_download_url(cid: str) -> str:
+    gateway = os.getenv("IPFS_GATEWAY_URL") or os.getenv("VITE_IPFS_GATEWAY") or _DEFAULT_IPFS_GATEWAY
+    return f"{gateway.rstrip('/')}/{cid}"
+
+
+def _safe_download_name(filename: str | None, fallback_cid: str) -> str:
+    if not filename:
+        return fallback_cid
+
+    normalized = str(filename).strip().replace("\r", "").replace("\n", "")
+    if not normalized:
+        return fallback_cid
+
+    # Keep only basename so headers never include path components.
+    basename = Path(normalized.replace("\\", "/")).name.strip()
+    return basename or fallback_cid
+
+
+def _download_ipfs_content(url: str) -> tuple[bytes, str]:
+    response = requests.get(url, timeout=45)
+    response.raise_for_status()
+    content_type = response.headers.get("content-type") or "application/octet-stream"
+    return response.content, content_type
+
+
 def _sort_latest(notes: list[Note]) -> list[Note]:
     return sorted(notes, key=lambda note: note.timestamp, reverse=True)
 
@@ -80,6 +111,62 @@ def _matches_filter(
 @router.get("/structure")
 async def get_structure() -> dict[str, dict[str, dict[str, list[str]]]]:
     return get_academic_structure()
+
+
+async def _serve_note_file(
+    cid: str,
+    filename: str | None,
+    disposition: str,
+) -> Response:
+    clean_cid = cid.strip()
+    if not clean_cid:
+        raise HTTPException(status_code=400, detail="CID is required.")
+
+    requested_disposition = disposition.strip().lower()
+    if requested_disposition not in {"attachment", "inline"}:
+        raise HTTPException(status_code=400, detail="Disposition must be 'attachment' or 'inline'.")
+
+    download_name = _safe_download_name(filename, clean_cid)
+    ipfs_url = _build_ipfs_download_url(clean_cid)
+
+    try:
+        content, content_type = await asyncio.to_thread(_download_ipfs_content, ipfs_url)
+    except requests.RequestException as exc:
+        detail = ""
+        if exc.response is not None and exc.response.text:
+            detail = exc.response.text.strip()
+
+        message = "Failed to fetch file from IPFS gateway."
+        if detail:
+            message = f"{message} {detail}"
+
+        raise HTTPException(status_code=502, detail=message) from exc
+
+    quoted_name = quote(download_name)
+    headers = {
+        "Content-Disposition": (
+            f"{requested_disposition}; filename=\"{download_name}\"; filename*=UTF-8''{quoted_name}"
+        )
+    }
+    return Response(content=content, media_type=content_type, headers=headers)
+
+
+@router.get("/download/{cid}")
+async def download_note_by_cid(
+    cid: str,
+    filename: str | None = Query(default=None),
+    disposition: str = Query(default="attachment"),
+) -> Response:
+    return await _serve_note_file(cid=cid, filename=filename, disposition=disposition)
+
+
+@router.get("/download/{cid}/{filename}")
+async def download_note_by_cid_with_name(
+    cid: str,
+    filename: str,
+    disposition: str = Query(default="attachment"),
+) -> Response:
+    return await _serve_note_file(cid=cid, filename=filename, disposition=disposition)
 
 
 @router.post("/upload", response_model=Note, status_code=status.HTTP_201_CREATED)

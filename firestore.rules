@@ -45,5 +45,44 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["likes", "likedBy"])
         && isValidLikeToggle();
     }
+
+    match /pythonLectures/{lectureId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.uploadedBy == request.auth.uid
+        && request.resource.data.lectureNumber is string
+        && request.resource.data.title is string
+        && request.resource.data.code is string
+        && request.resource.data.code.size() > 0;
+
+      allow update: if request.auth != null
+        && resource.data.uploadedBy == request.auth.uid
+        && request.resource.data.uploadedBy == resource.data.uploadedBy;
+
+      allow delete: if request.auth != null
+        && resource.data.uploadedBy == request.auth.uid;
+    }
+
+    match /pythonSolutions/{solutionId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.uploadedBy == request.auth.uid
+        && request.resource.data.contentType == "solution"
+        && request.resource.data.lectureNumber is string
+        && request.resource.data.lectureSubNumber is string
+        && request.resource.data.solutionTitle is string
+        && request.resource.data.solutionCode is string
+        && request.resource.data.solutionCode.size() > 0;
+
+      allow update: if request.auth != null
+        && resource.data.uploadedBy == request.auth.uid
+        && request.resource.data.uploadedBy == resource.data.uploadedBy
+        && request.resource.data.contentType == "solution";
+
+      allow delete: if request.auth != null
+        && resource.data.uploadedBy == request.auth.uid;
+    }
   }
 }

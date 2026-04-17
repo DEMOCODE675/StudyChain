@@ -9,11 +9,9 @@ ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
                 "Physics",
                 "Mathematics",
                 "Programming Basics",
-                "ACAD",
-                "ADAC",
                 "Soft Skills",
-                "Emerging Trends",
-                "Python Lab",
+                "Emerging Trends : 1",
+                "C Programming Lab",
             ],
             "Semester 2": [
                 
@@ -23,9 +21,9 @@ ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
                 "Electronics",
                 "Electrical",
                 "Mechanical",
-                "ADAC",
+                "ACAD",
                 "Soft Skills",
-                "Emerging Trends",
+                "Emerging Trends : 2",
                 "Python Programming Lab",
                 "Electronics Lab",
                 "Chemistry Lab",
@@ -39,64 +37,52 @@ ACADEMIC_STRUCTURE: dict[str, dict[str, dict[str, list[str]]]] = {
             ],
         },
         "2nd Year": {
-            "Semester 3": ["Data Structures", "Digital Electronics"],
-            "Semester 4": ["Operating Systems", "DBMS"],
+            "Semester 3": ["comming soon"],
+            "Semester 4": ["comming soon"],
         },
     },
+    
     "ECE": {
         "1st Year": {
             "Semester 1": [
-                "Physics",
-                "Mathematics",
-                "ACAD",
-                "ADAC",
-                "Soft Skills",
-                "Emerging Trends",
+                "comming soon"
             ],
             "Semester 2": [
-                "Mathematics",
-                "Physics",
-                "Basic Electronics",
-                "Electrical",
-                "Mechanical",
-                "ADAC",
-                "Soft Skills",
-                "Emerging Trends",
-                "Python Lab",
-                "Electronics Lab",
-                "Chemistry Lab",
+                "comming soon"
             ],
         },
         "2nd Year": {
-            "Semester 3": ["Signals and Systems", "Network Theory"],
-            "Semester 4": ["Microprocessors", "Communication Systems"],
+            "Semester 3": ["comming soon"],
+            "Semester 4": ["comming soon"],
         },
     },
     "ME": {
         "1st Year": {
             "Semester 1": [
-                "Engineering Mechanics",
-                "Mathematics",
-                "ACAD",
-                "ADAC",
-                "Soft Skills",
-                "Emerging Trends",
+                "comming soon"
             ],
             "Semester 2": [
-                "Mathematics",
-                "Physics",
-                "Thermodynamics",
-                "Material Science",
-                "Electrical",
-                "Mechanical",
-                "ADAC",
-                "Soft Skills",
-                "Emerging Trends",
-                "Python Lab",
-                "Electronics Lab",
-                "Chemistry Lab",
+                "comming soon"
             ],
-        }
+        },
+        "2nd Year": {
+            "Semester 3": ["comming soon"],
+            "Semester 4": ["comming soon"],
+        },
+    },
+    "ME": {
+        "1st Year": {
+            "Semester 1": [
+                "comming soon"
+            ],
+            "Semester 2": [
+                "comming soon"
+            ],
+        },
+        "2nd Year": {
+            "Semester 3": ["comming soon"],
+            "Semester 4": ["comming soon"],
+        },
     },
 }
 

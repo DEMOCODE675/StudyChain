@@ -1,4 +1,4 @@
-import { buildIpfsLink } from "../services/api";
+import { buildNoteDownloadLink, buildNoteViewLink } from "../services/api";
 
 function formatTimestamp(value) {
     const date = new Date(value || 0);
@@ -17,7 +17,8 @@ export default function NoteCard({
     isLiked = false,
     onRequireLogin,
 }) {
-    const ipfsLink = buildIpfsLink(note.cid);
+    const viewLink = buildNoteViewLink(note.cid, note.filename);
+    const downloadLink = buildNoteDownloadLink(note.cid, note.filename);
     const tags = Array.isArray(note.tags) ? note.tags : [];
     const noteIdentifier = note.id || note.cid;
 
@@ -86,7 +87,7 @@ export default function NoteCard({
 
             <div className="mt-4 flex flex-wrap gap-2">
                 <a
-                    href={ipfsLink}
+                    href={viewLink}
                     target="_blank"
                     rel="noreferrer"
                     className="rounded-lg border border-black px-3 py-2 text-sm font-medium transition hover:bg-black hover:text-white"
@@ -94,10 +95,9 @@ export default function NoteCard({
                     View
                 </a>
                 <a
-                    href={ipfsLink}
+                    href={downloadLink}
                     target="_blank"
                     rel="noreferrer"
-                    download={note.filename}
                     className="rounded-lg border border-zinc-400 px-3 py-2 text-sm font-medium transition hover:border-black"
                 >
                     Download

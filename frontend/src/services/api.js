@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+  baseURL: API_BASE_URL,
   timeout: 20000,
 });
 
@@ -60,4 +62,36 @@ export function buildIpfsLink(cid) {
   const gateway =
     import.meta.env.VITE_IPFS_GATEWAY || "https://gateway.pinata.cloud/ipfs";
   return `${gateway}/${cid}`;
+}
+
+function buildNoteFileLink(cid, filename, disposition) {
+  const safeCid = String(cid || "").trim();
+  if (!safeCid) {
+    return "#";
+  }
+
+  const params = new URLSearchParams();
+  const safeFilename = String(filename || "").trim();
+  const normalizedDisposition =
+    String(disposition || "attachment").toLowerCase() === "inline"
+      ? "inline"
+      : "attachment";
+  params.set("disposition", normalizedDisposition);
+
+  const query = params.toString();
+  const base = String(API_BASE_URL).replace(/\/+$/, "");
+  const encodedCid = encodeURIComponent(safeCid);
+  const encodedFilename = safeFilename ? encodeURIComponent(safeFilename) : "";
+  const path = encodedFilename
+    ? `/download/${encodedCid}/${encodedFilename}`
+    : `/download/${encodedCid}`;
+  return `${base}${path}${query ? `?${query}` : ""}`;
+}
+
+export function buildNoteDownloadLink(cid, filename) {
+  return buildNoteFileLink(cid, filename, "attachment");
+}
+
+export function buildNoteViewLink(cid, filename) {
+  return buildNoteFileLink(cid, filename, "inline");
 }

@@ -96,7 +96,7 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
         }
 
         if (!file) {
-            setErrorMessage("Please select a PDF or TXT file.");
+            setErrorMessage("Please select a PDF files to upload.");
             setSuccessMessage("");
             return;
         }
@@ -162,9 +162,6 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
         <section className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
             <div className="mb-4">
                 <h2 className="text-xl font-semibold">Upload New Note</h2>
-                <p className="mt-1 text-sm text-zinc-600">
-                    Select an academic path, add chapter and tags, then upload your note to IPFS.
-                </p>
             </div>
 
             {!user ? (
@@ -184,7 +181,7 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
                 </div>
             ) : (
                 <div className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-700">
-                    Uploading as <span className="font-semibold">{user.name || "Student"}</span>
+                    Uploading as <span className="font-semibold text-violet-700">{user.name || "Student"}</span>
                 </div>
             )}
 
@@ -274,7 +271,7 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
                             type="text"
                             value={chapter}
                             onChange={(event) => setChapter(event.target.value)}
-                            placeholder="Sorting, Unit 2, Chapter 4..."
+                            placeholder="Unit 2, Chapter 4..."
                             className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
                         />
 

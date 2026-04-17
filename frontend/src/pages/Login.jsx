@@ -56,23 +56,24 @@ export default function Login({
     return (
         <section className="space-y-4">
             <header className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                <p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Authentication</p>
+                {/*<p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Authentication</p>*/}
                 <h2 className="mt-2 text-3xl font-bold tracking-tight">Login</h2>
-                <p className="mt-2 text-sm text-zinc-600">
-                    Use Google Sign-In to upload notes, like community content, and manage your personal
-                    uploads.
-                </p>
+                {/*<p className="mt-2 text-sm text-zinc-600">
+                    Use Google Sign-In to upload notes, like content, and manage your uploads.
+                </p>*/}
                 {fromPath ? (
-                    <p className="mt-2 text-xs text-zinc-500">
-                        You need to sign in to continue to <span className="mono">{fromPath}</span>.
+                    <p className="mt-2 text-center text-xs text-zinc-500">
+                        {/* You need to sign in to continue to <span className="mono">{fromPath}</span>.*/}
+                        You need to sign in to continue to upload and like notes.
                     </p>
                 ) : null}
             </header>
 
             {!isFirebaseConfigured ? (
                 <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                    Firebase is not configured. Add the VITE_FIREBASE_* variables in
-                    <span className="mono"> frontend/.env</span> and restart the frontend.
+                    {/*Firebase is not configured. Add the VITE_FIREBASE_* variables in
+                    <span className="mono"> frontend/.env</span> and restart the frontend.*/}
+                    try again later.
                 </div>
             ) : null}
 

@@ -6,17 +6,27 @@ import { useAuth } from "./context/AuthContext";
 import Explore from "./pages/Explore";
 import Login from "./pages/Login";
 import MyUploads from "./pages/MyUploads";
+import PythonProgramming from "./pages/PythonProgramming";
 import Upload from "./pages/Upload";
 import { fetchStructure, readApiError } from "./services/api";
 
 const PAGE_TO_PATH = {
     explore: "/explore",
+    "python-solutions": "/python-solutions",
     upload: "/upload",
     "my-uploads": "/my-uploads",
     login: "/login",
 };
 
 function pathToPage(pathname) {
+    if (pathname.startsWith("/python-solutions")) {
+        return "python-solutions";
+    }
+
+    if (pathname.startsWith("/python-programming")) {
+        return "python-solutions";
+    }
+
     if (pathname.startsWith("/upload")) {
         return "upload";
     }
@@ -194,6 +204,19 @@ export default function App() {
                                     onRequestLogin={loginWithGoogle}
                                 />
                             )}
+                        />
+                        <Route
+                            path="/python-solutions"
+                            element={(
+                                <PythonProgramming
+                                    user={user}
+                                    onRequestLogin={loginWithGoogle}
+                                />
+                            )}
+                        />
+                        <Route
+                            path="/python-programming"
+                            element={<Navigate to="/python-solutions" replace />}
                         />
                         <Route
                             path="/upload"

@@ -4,12 +4,8 @@ export default function Upload({ structure, user, onRequestLogin, onUploadSucces
     return (
         <section className="space-y-4">
             <header className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                <p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Contribute</p>
+                {/*<p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Contribute</p>*/}
                 <h2 className="mt-2 text-3xl font-bold tracking-tight">Upload Notes</h2>
-                <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-                    Share your study material with the community using structured metadata so everyone can
-                    discover notes quickly.
-                </p>
             </header>
 
             <UploadForm

@@ -111,6 +111,11 @@ export default function Sidebar({
                     onClick={() => onNavigate("explore")}
                 />
                 <SidebarSectionButton
+                    label="Python Solutions"
+                    active={activePage === "python-solutions"}
+                    onClick={() => onNavigate("python-solutions")}
+                />
+                <SidebarSectionButton
                     label="Upload"
                     active={activePage === "upload"}
                     onClick={() => onNavigate("upload")}
@@ -132,7 +137,7 @@ export default function Sidebar({
 
                 {!isFirebaseConfigured ? (
                     <p className="mt-2 text-xs text-zinc-600">
-                        Add Firebase config in frontend/.env to enable Google login and Firestore sync.
+                        try again later...
                     </p>
                 ) : null}
 
@@ -178,7 +183,7 @@ export default function Sidebar({
                             disabled={!isFirebaseConfigured || isAuthActionPending || isAuthLoading}
                             className="w-full rounded-lg border border-black bg-black px-3 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            {isAuthActionPending ? "Opening Google..." : "Login with Google"}
+                            {isAuthActionPending ? "Loading..." : "Login with Google"}
                         </button>
                     </div>
                 )}
@@ -188,7 +193,7 @@ export default function Sidebar({
 
             <section className="mt-5 rounded-2xl border border-zinc-300 bg-white p-3">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-sm font-semibold">Academic Navigation</h2>
+                    <h2 className="text-sm font-semibold">Academic Structure</h2>
                     <button
                         type="button"
                         onClick={onResetFilters}
@@ -363,23 +368,6 @@ export default function Sidebar({
                         })}
                     </ul>
                 )}
-            </section>
-
-            <section className="mt-5 rounded-2xl border border-zinc-300 bg-white p-3">
-                <h2 className="text-sm font-semibold">Web3</h2>
-                <p className="mt-1 text-xs text-zinc-600">
-                    Uploader identity is linked internally and can later map to a wallet for smart-contract CID anchoring.
-                </p>
-                <p className="mono mt-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-[11px] text-zinc-600">
-                    {user ? "Identity linked for uploads and likes." : "Sign in to attach uploads to your identity."}
-                </p>
-                <button
-                    type="button"
-                    className="mono mt-3 w-full rounded-lg border border-zinc-300 px-3 py-2 text-xs uppercase tracking-[0.12em] text-zinc-500"
-                    disabled
-                >
-                    MetaMask Integration (Soon)
-                </button>
             </section>
         </aside>
     );

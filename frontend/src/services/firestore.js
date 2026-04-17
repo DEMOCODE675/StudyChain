@@ -74,6 +74,14 @@ function normalizeLikedBy(value) {
   );
 }
 
+function normalizeLikedByPreserveOrder(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((uid) => String(uid || "")).filter(Boolean);
+}
+
 function mapNoteDoc(snapshot) {
   const data = snapshot.data() || {};
 
@@ -93,25 +101,6 @@ function mapNoteDoc(snapshot) {
     likedBy: normalizeLikedBy(data.likedBy),
     createdAt: normalizeCreatedAt(data.createdAt),
   };
-}
-
-async function resolveNoteReference(identifier) {
-  const directRef = doc(db, NOTES_COLLECTION, identifier);
-  const directSnapshot = await getDoc(directRef);
-
-  if (directSnapshot.exists()) {
-    return directRef;
-  }
-
-  // Backward compatibility: some old clients may pass CID instead of Firestore doc id.
-  const cidQuery = query(collection(db, NOTES_COLLECTION), where("cid", "==", identifier));
-  const cidSnapshot = await getDocs(cidQuery);
-
-  if (cidSnapshot.empty) {
-    throw new Error("Note not found.");
-  }
-
-  return cidSnapshot.docs[0].ref;
 }
 
 function sortLatest(notes) {
@@ -244,50 +233,79 @@ export async function likeNote(noteId, userId) {
     throw new Error("Cannot update like: login is required.");
   }
 
-  const noteRef = await resolveNoteReference(identifier);
-  let toggledAction = "liked";
+  const NOT_FOUND_CODE = "note-not-found";
 
-  try {
-    await runTransaction(db, async (transaction) => {
+  async function applyLikeToggle(noteRef) {
+    return runTransaction(db, async (transaction) => {
       const snapshot = await transaction.get(noteRef);
       if (!snapshot.exists()) {
-        throw new Error("Note not found.");
+        const missingError = new Error("Note not found.");
+        missingError.code = NOT_FOUND_CODE;
+        throw missingError;
       }
 
       const payload = snapshot.data() || {};
-      const currentLikes = normalizeLikeCount(payload.likes);
-      const currentLikedBy = normalizeLikedBy(payload.likedBy);
+      const currentLikes =
+        typeof payload.likes === "number" && Number.isFinite(payload.likes)
+          ? payload.likes
+          : 0;
+      const currentLikedBy = normalizeLikedByPreserveOrder(payload.likedBy);
       const alreadyLiked = currentLikedBy.includes(normalizedUserId);
 
       const nextLikedBy = alreadyLiked
         ? currentLikedBy.filter((uid) => uid !== normalizedUserId)
         : [...currentLikedBy, normalizedUserId];
       const nextLikes = alreadyLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+      const toggledAction = alreadyLiked ? "unliked" : "liked";
 
-      toggledAction = alreadyLiked ? "unliked" : "liked";
       transaction.update(noteRef, {
         likes: nextLikes,
         likedBy: nextLikedBy,
       });
+
+      return {
+        ...mapNoteDoc(snapshot),
+        likes: nextLikes,
+        likedBy: normalizeLikedBy(nextLikedBy),
+        action: toggledAction,
+      };
     });
+  }
+
+  const directRef = doc(db, NOTES_COLLECTION, identifier);
+
+  try {
+    return await applyLikeToggle(directRef);
   } catch (error) {
     const code = String(error?.code || "");
+
+    if (code === NOT_FOUND_CODE) {
+      // Backward compatibility for legacy clients that may still pass CID.
+      const cidQuery = query(collection(db, NOTES_COLLECTION), where("cid", "==", identifier));
+      const cidSnapshot = await getDocs(cidQuery);
+
+      if (cidSnapshot.empty) {
+        throw new Error("Note not found.");
+      }
+
+      try {
+        return await applyLikeToggle(cidSnapshot.docs[0].ref);
+      } catch (fallbackError) {
+        const fallbackCode = String(fallbackError?.code || "");
+        if (fallbackCode.includes("permission-denied")) {
+          throw new Error("Like update failed: check Firestore rules for like/unlike permissions.");
+        }
+
+        throw fallbackError;
+      }
+    }
+
     if (code.includes("permission-denied")) {
       throw new Error("Like update failed: check Firestore rules for like/unlike permissions.");
     }
 
     throw error;
   }
-
-  const updatedSnapshot = await getDoc(noteRef);
-  if (!updatedSnapshot.exists()) {
-    throw new Error("Note not found.");
-  }
-
-  return {
-    ...mapNoteDoc(updatedSnapshot),
-    action: toggledAction,
-  };
 }
 
 export async function getNotesByUser(uid) {

@@ -24,6 +24,8 @@ function mapAuthUser(firebaseUser) {
   };
 }
 
+
+{/*
 function readAuthError(error, fallback) {
   const code = String(error?.code || "");
 
@@ -40,7 +42,7 @@ function readAuthError(error, fallback) {
   }
 
   return String(error?.message || fallback);
-}
+}*/}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -54,14 +56,14 @@ export function AuthProvider({ children }) {
     }
 
     let active = true;
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
 
     async function initializeAuth() {
       try {
         await setPersistence(auth, browserLocalPersistence);
       } catch (error) {
         if (active) {
-          setAuthError(readAuthError(error, "Failed to initialize auth session."));
+          setAuthError(readAuthError(error, "try again later..."));
         }
       }
 
@@ -86,7 +88,7 @@ export function AuthProvider({ children }) {
   async function loginWithGoogle() {
     if (!isFirebaseConfigured || !auth) {
       const message =
-        "Firebase is not configured. Add VITE_FIREBASE_* values in frontend/.env.";
+        "try again later...";
       setAuthError(message);
       throw new Error(message);
     }
@@ -130,7 +132,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider.");
+    throw new Error("try again later...");
   }
 
   return context;

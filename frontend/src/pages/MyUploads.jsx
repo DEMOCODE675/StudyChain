@@ -19,6 +19,34 @@ function sortNotes(notes, sortBy) {
     );
 }
 
+function applyOptimisticLike(notes, noteId, userId) {
+    return notes.map((note) => {
+        const isTarget =
+            note.id === noteId ||
+            note.cid === noteId;
+
+        if (!isTarget) {
+            return note;
+        }
+
+        const currentLikedBy = Array.isArray(note.likedBy) ? note.likedBy : [];
+        const alreadyLiked = currentLikedBy.includes(userId);
+        const nextLikedBy = alreadyLiked
+            ? currentLikedBy.filter((uid) => uid !== userId)
+            : [...currentLikedBy, userId];
+        const currentLikes = typeof note.likes === "number" && Number.isFinite(note.likes)
+            ? note.likes
+            : 0;
+        const nextLikes = alreadyLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+
+        return {
+            ...note,
+            likedBy: nextLikedBy,
+            likes: nextLikes,
+        };
+    });
+}
+
 export default function MyUploads({ user, onRequestLogin, refreshToken }) {
     const [notes, setNotes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +108,13 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
             return;
         }
 
+        if (likingNoteId === noteId) {
+            return;
+        }
+
+        setErrorMessage("");
+        const previousNotes = notes;
+        setNotes((prev) => applyOptimisticLike(prev, noteId, user.uid));
         setLikingNoteId(noteId);
         try {
             const updated = await likeNote(noteId, user.uid);
@@ -94,6 +129,7 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
                 )
             );
         } catch (error) {
+            setNotes(previousNotes);
             setErrorMessage(readApiError(error, "Failed to like this note."));
         } finally {
             setLikingNoteId("");
@@ -104,10 +140,10 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
         return (
             <section className="space-y-4">
                 <header className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                    <p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Personal Space</p>
+                    {/*<p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Personal Space</p>*/}
                     <h2 className="mt-2 text-3xl font-bold tracking-tight">My Uploads</h2>
                     <p className="mt-2 text-sm text-zinc-600">
-                        Login to view notes uploaded by your account.
+                        Login to view notes uploaded by you.
                     </p>
                     <button
                         type="button"
@@ -128,14 +164,14 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
     return (
         <section className="space-y-4">
             <header className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
-                <p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Personal Space</p>
+                {/*<p className="mono text-xs uppercase tracking-[0.14em] text-zinc-500">Personal Space</p>*/}
                 <h2 className="mt-2 text-3xl font-bold tracking-tight">My Uploads</h2>
                 <p className="mt-2 text-sm text-zinc-600">
-                    Showing notes uploaded by <span className="mono">{user.name || "Student"}</span>
+                    Notes uploaded by you: <span className="mono text-violet-700">{user.name || "Student"}</span>
                 </p>
 
-                <div className="mt-4 w-full max-w-[220px]">
-                    <label className="text-sm font-medium text-zinc-700">
+                {/*  <div className="mt-4 w-full max-w-[220px]">
+                   <label className="text-sm font-medium text-zinc-700">
                         Sort by
                         <select
                             value={sortBy}
@@ -146,7 +182,7 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
                             <option value="likes">Most liked</option>
                         </select>
                     </label>
-                </div>
+                </div>*/}
             </header>
 
             {errorMessage ? (
