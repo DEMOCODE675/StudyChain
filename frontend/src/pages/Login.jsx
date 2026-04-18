@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function Login({
     user,
     isAuthLoading,
-    authError,
     isFirebaseConfigured,
     onLogin,
     onLogout,
@@ -74,12 +73,6 @@ export default function Login({
                     {/*Firebase is not configured. Add the VITE_FIREBASE_* variables in
                     <span className="mono"> frontend/.env</span> and restart the frontend.*/}
                     try again later.
-                </div>
-            ) : null}
-
-            {authError ? (
-                <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {authError}
                 </div>
             ) : null}
 

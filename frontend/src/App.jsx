@@ -68,7 +68,7 @@ function RequireAuth({ user, isAuthLoading, children }) {
 
 export default function App() {
     const [structure, setStructure] = useState({});
-    const [structureError, setStructureError] = useState("");
+    const [, setStructureError] = useState("");
     const [filters, setFilters] = useState({
         branch: "",
         year: "",
@@ -170,22 +170,10 @@ export default function App() {
                         </p>
                     </div>
 
-                    {structureError ? (
-                        <div className="mono mb-5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-700">
-                            {structureError}
-                        </div>
-                    ) : null}
-
                     {!isFirebaseConfigured ? (
                         <div className="mono mb-5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-700">
                             Firebase is not configured. Add VITE_FIREBASE_* values to frontend/.env to use
                             Authentication and Firestore.
-                        </div>
-                    ) : null}
-
-                    {authError ? (
-                        <div className="mono mb-5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-700">
-                            {authError}
                         </div>
                     ) : null}
 

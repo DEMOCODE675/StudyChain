@@ -44,10 +44,10 @@ function sortSolutionsByLecture(solutions) {
 function formatCreatedAt(value) {
     const date = new Date(value || 0);
     if (Number.isNaN(date.getTime())) {
-        return "Unknown time";
+        return "Unknown date";
     }
 
-    return date.toLocaleString();
+    return date.toLocaleDateString();
 }
 
 function getIsMobileViewport() {
@@ -91,7 +91,7 @@ export default function PythonProgramming({ user, onRequestLogin }) {
     const [solutions, setSolutions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [copiedSolutionId, setCopiedSolutionId] = useState("");
 
@@ -379,12 +379,6 @@ export default function PythonProgramming({ user, onRequestLogin }) {
                 </div>
             </header>
 
-            {errorMessage ? (
-                <div className="mono rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-700">
-                    {errorMessage}
-                </div>
-            ) : null}
-
             {successMessage ? (
                 <div className="mono rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
                     {successMessage}
@@ -458,7 +452,7 @@ export default function PythonProgramming({ user, onRequestLogin }) {
                         </label>
 
                         <label className="block text-sm font-medium text-zinc-700">
-                            Problem statement (optional)
+                            Description (optional)
                             <textarea
                                 value={problemStatement}
                                 onChange={(event) => setProblemStatement(event.target.value)}

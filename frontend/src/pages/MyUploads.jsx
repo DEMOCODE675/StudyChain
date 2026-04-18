@@ -50,7 +50,7 @@ function applyOptimisticLike(notes, noteId, userId) {
 export default function MyUploads({ user, onRequestLogin, refreshToken }) {
     const [notes, setNotes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [, setErrorMessage] = useState("");
     const [sortBy, setSortBy] = useState("latest");
     const [likingNoteId, setLikingNoteId] = useState("");
 
@@ -184,12 +184,6 @@ export default function MyUploads({ user, onRequestLogin, refreshToken }) {
                     </label>
                 </div>*/}
             </header>
-
-            {errorMessage ? (
-                <div className="mono rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-xs text-red-700">
-                    {errorMessage}
-                </div>
-            ) : null}
 
             <section className="rounded-2xl border border-zinc-300 bg-white p-5 md:p-6">
                 {isLoading ? <p className="text-sm text-zinc-500">Loading your notes...</p> : null}

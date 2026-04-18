@@ -13,7 +13,14 @@ export function readApiError(error, fallback = "Something went wrong.") {
   }
 
   if (error?.message) {
-    return String(error.message);
+    const message = String(error.message).trim();
+    const lowerMessage = message.toLowerCase();
+
+    if (error?.code === "ECONNABORTED" || lowerMessage.includes("timeout") || lowerMessage.includes("network error")) {
+      return fallback;
+    }
+
+    return message;
   }
 
   return fallback;

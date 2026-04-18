@@ -24,7 +24,6 @@ export default function Sidebar({
     onResetFilters,
     user,
     isAuthLoading,
-    authError,
     isFirebaseConfigured,
     onLogin,
     onLogout,
@@ -187,8 +186,6 @@ export default function Sidebar({
                         </button>
                     </div>
                 )}
-
-                {authError ? <p className="mt-2 text-xs text-red-700">{authError}</p> : null}
             </section>
 
             <section className="mt-5 rounded-2xl border border-zinc-300 bg-white p-3">

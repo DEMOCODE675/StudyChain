@@ -52,7 +52,7 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
     const [file, setFile] = useState(null);
 
     const [isUploading, setIsUploading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
 
     const branches = useMemo(() => Object.keys(structure || {}), [structure]);
@@ -330,12 +330,6 @@ export default function UploadForm({ structure, user, onUploaded, onRequestLogin
             {successMessage ? (
                 <p className="mono mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
                     {successMessage}
-                </p>
-            ) : null}
-
-            {errorMessage ? (
-                <p className="mono mt-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-700">
-                    {errorMessage}
                 </p>
             ) : null}
         </section>
