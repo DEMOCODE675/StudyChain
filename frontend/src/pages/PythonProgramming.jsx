@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
+import { EditorView } from "@codemirror/view";
 import { githubDark, githubLight } from "@uiw/codemirror-theme-github";
 import { indentationMarkers } from "@replit/codemirror-indentation-markers";
+import { useNavigate } from "react-router-dom";
 
 import { readApiError } from "../services/api";
 import {
@@ -88,6 +90,7 @@ function getEditorHeightForCode(
 }
 
 export default function PythonProgramming({ user, onRequestLogin }) {
+    const navigate = useNavigate();
     const [solutions, setSolutions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -106,17 +109,22 @@ export default function PythonProgramming({ user, onRequestLogin }) {
     const [activeLectureNumber, setActiveLectureNumber] = useState("");
     const [isMobileViewport, setIsMobileViewport] = useState(getIsMobileViewport);
 
-    const pythonExtensions = useMemo(
-        () => [
+    const pythonExtensions = useMemo(() => {
+        const extensions = [
             python(),
             indentationMarkers({
                 highlightActiveBlock: true,
                 markerType: "fullScope",
                 hideFirstIndent: false,
             }),
-        ],
-        []
-    );
+        ];
+
+        if (isMobileViewport) {
+            extensions.push(EditorView.lineWrapping);
+        }
+
+        return extensions;
+    }, [isMobileViewport]);
 
     useEffect(() => {
         let active = true;
@@ -373,6 +381,14 @@ export default function PythonProgramming({ user, onRequestLogin }) {
                     <p className="mt-2 max-w-3xl text-sm text-zinc-700">
                         Add only Python solutions and organize them by lecture number and sub lecture number.
                     </p>
+                    <button
+                        type="button"
+                        onClick={() => navigate("/python-compiler")}
+                        className="mono mt-4 inline-flex items-center gap-2 rounded-lg border border-black bg-black px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-white transition hover:bg-white hover:text-black"
+                    >
+                        <span className="text-sm leading-none">{"</>"}</span>
+                        Python Compiler
+                    </button>
                     {/*<p className="mono mt-3 inline-flex rounded-md border border-black/20 bg-black/5 px-2 py-1 text-[11px] uppercase tracking-[0.08em] text-zinc-700">
                         Locked mode: solution only
                     </p>*/}
@@ -464,7 +480,7 @@ export default function PythonProgramming({ user, onRequestLogin }) {
 
                         <div>
                             <p className="text-sm font-medium text-zinc-700">Solution code</p>
-                            <div className="-mx-2 mt-1 overflow-hidden rounded-lg border border-zinc-300 sm:mx-0">
+                            <div className="-mx-2 mt-1 max-w-full overflow-x-auto rounded-lg border border-zinc-300 sm:mx-0">
                                 <CodeMirror
                                     value={solutionCode}
                                     height={composeEditorHeight}
@@ -634,7 +650,7 @@ export default function PythonProgramming({ user, onRequestLogin }) {
                                             <p className="mt-2 text-sm text-zinc-700">{item.problemStatement}</p>
                                         ) : null}
 
-                                        <div className="-mx-2 mt-3 overflow-hidden rounded-lg border border-zinc-800 sm:mx-0">
+                                        <div className="-mx-2 mt-3 max-w-full overflow-x-auto rounded-lg border border-zinc-800 sm:mx-0">
                                             <CodeMirror
                                                 value={item.solutionCode}
                                                 height={getEditorHeightForCode(item.solutionCode, {

@@ -6,6 +6,7 @@ import { useAuth } from "./context/AuthContext";
 import Explore from "./pages/Explore";
 import Login from "./pages/Login";
 import MyUploads from "./pages/MyUploads";
+import PythonCompiler from "./pages/PythonCompiler";
 import PythonProgramming from "./pages/PythonProgramming";
 import Upload from "./pages/Upload";
 import { fetchStructure, readApiError } from "./services/api";
@@ -20,6 +21,10 @@ const PAGE_TO_PATH = {
 
 function pathToPage(pathname) {
     if (pathname.startsWith("/python-solutions")) {
+        return "python-solutions";
+    }
+
+    if (pathname.startsWith("/python-compiler")) {
         return "python-solutions";
     }
 
@@ -201,6 +206,10 @@ export default function App() {
                                     onRequestLogin={loginWithGoogle}
                                 />
                             )}
+                        />
+                        <Route
+                            path="/python-compiler"
+                            element={<PythonCompiler />}
                         />
                         <Route
                             path="/python-programming"
